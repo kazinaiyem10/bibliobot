@@ -1,0 +1,13 @@
+venv/
+env/
+.venv/
+vector_store/
+__pycache__/
+*.pyc
+*.bin
+.env
+.streamlit/secrets.toml
+.DS_Store
+.vscode/
+.idea/
+*.log
