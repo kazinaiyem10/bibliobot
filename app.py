@@ -28,8 +28,8 @@ warnings.filterwarnings("ignore", message=".*HF_TOKEN.*")
 # 1. Page Configuration & Fancy Custom CSS
 # =====================================================================
 st.set_page_config(
-    page_title="BiblioBot - Multisource RAG",
-    page_icon="📚",
+    page_title="BiblioBot",
+    # page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -485,10 +485,10 @@ with st.sidebar:
     st.markdown(
         "<div style='font-family:Sora,sans-serif;font-weight:800;font-size:1.4rem;"
         "background:linear-gradient(90deg,#c084fc,#818cf8);-webkit-background-clip:text;"
-        "-webkit-text-fill-color:transparent;'>📚 BiblioBot</div>",
+        "-webkit-text-fill-color:transparent;'>BiblioBot</div>",
         unsafe_allow_html=True
     )
-    st.caption("Multisource RAG Engine v3.0")
+    # st.caption("Multisource RAG Engine v3.0")
     st.markdown("---")
 
     if st.button("➕ Start New Chat", use_container_width=True, type="primary"):
@@ -527,7 +527,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### 🗂️ Catalog Manager")
-    st.write("Explore your synced vector source files below:")
+    # st.write("Explore your synced vector source files below:")
 
     with st.expander("📖 Library Holdings"):
         render_sidebar_catalog(LIBRARY_PATH)
@@ -790,7 +790,7 @@ header_html = f"""
 <div class="header-container">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; position: relative; z-index: 1;">
         <div>
-            <div class="header-title">📚 BiblioBot Workspace</div>
+            <div class="header-title">BiblioBot Workspace</div>
             <div class="header-sub">Conversational AI Recommender &amp; Library Management Engine</div>
         </div>
         <div style="display: flex; gap: 12px; margin-top: 10px;">
@@ -817,7 +817,7 @@ if "messages" not in st.session_state:
             for doc in saved_history
         ]
     else:
-        welcome_text = "Hello! I am monitoring your **Library** and **Wishlist** collections. Ask for book recommendations or issue database commands like *'Add Dune to my wishlist'*."
+        welcome_text = "Hello! I am monitoring your collections. Ask for book recommendations or issue commands like *'Add Dune to my wishlist'*."
         st.session_state.messages = [{"role": "assistant", "content": welcome_text}]
 
 for msg in st.session_state.messages:
