@@ -267,6 +267,60 @@ st.markdown("""
     .stSpinner > div {
         border-top-color: #a855f7 !important;
     }
+
+
+    
+
+/* Unified Chat Pill Container */
+    .chat-pill {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 6px 14px;
+        margin-bottom: 8px;
+        text-decoration: none !important;
+        transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .chat-pill:hover {
+        background: rgba(255, 255, 255, 0.09);
+        border-color: rgba(168, 85, 247, 0.4);
+    }
+    .chat-pill-active {
+        background: rgba(168, 85, 247, 0.18) !important;
+        border-color: rgba(168, 85, 247, 0.5) !important;
+    }
+
+    .chat-title {
+        color: #e2e8f0;
+        font-size: 0.88rem;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex-grow: 1;
+        text-decoration: none !important;
+    }
+
+    .chat-del-btn {
+        color: #94a3b8;
+        font-size: 0.95rem;
+        padding: 2px 4px;
+        border-radius: 6px;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none !important;
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+    .chat-del-btn:hover {
+        color: #ef4444 !important;
+        transform: scale(1.2);
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -494,7 +548,23 @@ with st.sidebar:
     if st.button("➕ Start New Chat", use_container_width=True, type="primary"):
         switch_session(db.new_session_id())
 
-    st.markdown("### 💬 Chat History")
+    st.markdown("###  Chat History")
+    
+    # Handle deletion query parameter from HTML click 
+    if "delete_session" in st.query_params:
+        target_del_id = st.query_params["delete_session"]
+        db.delete_session(target_del_id)
+        
+        # Clear query params and reset active session if deleted
+        del st.query_params["delete_session"]
+        if target_del_id == st.session_state.session_id:
+            new_id = db.new_session_id()
+            st.session_state.session_id = new_id
+            st.query_params["session_id"] = new_id
+            if "messages" in st.session_state:
+                del st.session_state["messages"]
+        st.rerun()
+
     if mongo_connected:
         recent_sessions = db.list_recent_sessions(limit=15)
         
@@ -509,24 +579,36 @@ with st.sidebar:
 
             active_history_found = True
             preview_title = user_msgs[0]
-            if len(preview_title) > 28:
-                preview_title = preview_title[:25] + "..."
+            if len(preview_title) > 22:
+                preview_title = preview_title[:19] + "..."
 
             is_active = (s_id == st.session_state.session_id)
-            btn_label = f"💬 {preview_title}" if not is_active else f"👉 **{preview_title}**"
-            btn_type = "secondary" if not is_active else "primary"
+            active_class = "chat-pill-active" if is_active else ""
+            title_prefix = "💬 " if is_active else "💬 "
 
-            if st.button(btn_label, key=f"sess_{s_id}", use_container_width=True, type=btn_type):
-                if not is_active:
-                    switch_session(s_id)
+            # Single HTML element: perfectly aligned, zero split borders
+            st.markdown(
+                f"""
+                <div class="chat-pill {active_class}">
+                    <a href="?session_id={s_id}" target="_self" class="chat-title">
+                        {title_prefix}{preview_title}
+                    </a>
+                    <a href="?delete_session={s_id}" target="_self" class="chat-del-btn" title="Delete Chat">
+                        🗑️
+                    </a>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
         if not active_history_found:
             st.caption("No chat history yet. Send a message to start!")
     else:
         st.caption("MongoDB disconnected. History unavailable.")
 
+
     st.markdown("---")
-    st.markdown("### 🗂️ Catalog Manager")
+    st.markdown("###  Catalog Manager")
     # st.write("Explore your synced vector source files below:")
 
     with st.expander("📖 Library Holdings"):
