@@ -151,3 +151,18 @@ def list_recent_sessions(limit=20):
     except Exception as e:
         print(f"[MongoDB] Failed to list sessions: {e}")
         return []
+
+
+def delete_session(session_id):
+    """Deletes all logs associated with a session ID from MongoDB."""
+    db = get_db()
+    if db is None:
+        return False
+
+    try:
+        db["chat_logs"].delete_many({"session_id": session_id})
+        db["mutation_logs"].delete_many({"session_id": session_id})
+        return True
+    except Exception as e:
+        print(f"[MongoDB] Failed to delete session: {e}")
+        return False
